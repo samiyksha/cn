@@ -1,0 +1,52 @@
+import numpy as np
+
+class Router:
+    def __init__(self, name, num_nodes):
+        self.name = name
+        self.distance_vector = np.full(num_nodes, np.inf)  # Initialize distances as infinity
+        self.neighbors = {}  # Store neighbors with link costs
+        self.distance_vector[name] = 0  # Distance to itself is 0
+
+    def add_neighbor(self, neighbor, cost):
+        self.neighbors[neighbor] = cost
+        self.distance_vector[neighbor] = cost
+
+    def update_distance_vector(self, routers):
+        updated = False
+        for neighbor, cost_to_neighbor in self.neighbors.items():
+            for destination, cost_from_neighbor in enumerate(routers[neighbor].distance_vector):
+                new_distance = cost_to_neighbor + cost_from_neighbor
+                if new_distance < self.distance_vector[destination]:
+                    self.distance_vector[destination] = new_distance
+                    updated = True
+        return updated
+
+def distance_vector_routing(num_nodes, connections):
+    routers = [Router(i, num_nodes) for i in range(num_nodes)]
+    
+    for (src, dst, cost) in connections:
+        routers[src].add_neighbor(dst, cost)
+        routers[dst].add_neighbor(src, cost)
+
+    # Update until no more updates occur
+    while True:
+        updates = [router.update_distance_vector(routers) for router in routers]
+        if not any(updates):
+            break
+
+    # Display the routing table for each router
+    print("Distance Vectors (Routing Tables):")
+    for i, router in enumerate(routers):
+        print(f"Router {i}: {list(router.distance_vector)}")
+
+# Example Usage
+num_nodes = 4
+connections = [
+    (0, 1, 1),  # (source, destination, cost)
+    (0, 2, 4),
+    (1, 2, 2),
+    (1, 3, 6),
+    (2, 3, 3)
+]
+
+distance_vector_routing(num_nodes, connections)
