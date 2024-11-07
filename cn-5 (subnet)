@@ -1,0 +1,32 @@
+import ipaddress
+
+def subnet_calculator(ip, prefix_length):
+    try:
+        # Create a network object with the IP and prefix length
+        network = ipaddress.IPv4Network(f"{ip}/{prefix_length}", strict=False)
+        
+        # Display subnet mask, network address, and broadcast address
+        subnet_mask = network.netmask
+        network_address = network.network_address
+        broadcast_address = network.broadcast_address
+        num_of_hosts = network.num_addresses - 2  # Subtracting network and broadcast
+        
+        print(f"IP Address: {ip}")
+        print(f"Subnet Prefix Length: /{prefix_length}")
+        print(f"Subnet Mask: {subnet_mask}")
+        print(f"Network Address: {network_address}")
+        print(f"Broadcast Address: {broadcast_address}")
+        print(f"Number of Hosts: {num_of_hosts}")
+        
+        # Generate all possible IP addresses in the subnet
+        print("\nAll Possible IP Addresses in this subnet:")
+        for ip in network.hosts():
+            print(ip)
+            
+    except ValueError as e:
+        print(f"Error: {e}")
+
+# Example Usage
+ip_address = "192.168.1.0"   # Replace with desired IP address
+prefix_length = 24           # Replace with desired prefix length (e.g., 24, 26, etc.)
+subnet_calculator(ip_address, prefix_length)
